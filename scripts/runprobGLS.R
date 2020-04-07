@@ -7,15 +7,12 @@ gE <- -3.5
 
 # -------------------------------------------------------------
 
-for (i in 21:40) {
+for (i in c(5, 25, 36, 37, 46, 47, 50, 51, 59)) {
   
   idx <- sub(".RData", "", theFiles[i])
   
   # Save file
   load(paste0("E:/Geolocators/analysis/processed/", theFiles[i]))
-  
-  #gE <- getElevation(twl =trn[1:30,], known.coord = c(-82.01,62.95))
-
   
   pr   <- prob_algorithm(trn                         = trn,
                          sensor                      = temp,
@@ -25,10 +22,10 @@ for (i in 21:40) {
                          loess.quartile              = NULL,
                          tagging.location            = c(-82.01,62.95),
                          particle.number             = 1000,
-                         iteration.number            = 100,
+                         iteration.number            = 500,
                          sunrise.sd                  = tw,
                          sunset.sd                   = tw,
-                         range.solar                 = c(-10,2),
+                         range.solar                 = c(-7,0),
                          speed.wet                   = c(1 , 1.3, 5),
                          speed.dry                   = c(15, 5, 25),
                          sst.sd                      = 0.1,      
