@@ -19,18 +19,17 @@ coatsTwl <- coatsTwl %>%
   dplyr::select(date, dawn, dusk)
 
 #####
-depDates <- read.csv("C:/Users/Allison/Documents/PhD research/Coats 2019 Data/TBMU GLS Data/Analysis/Deployment_Dates_2019.csv",
-                     stringsAsFactors = F)
+depDates <- read.csv("E:/Geolocators/data/Deployment_Dates_2019.csv", stringsAsFactors = F)
 depDates$Deploy.Off <- as.Date(depDates$Deploy.Off)
 depDates$Deploy.On <- as.Date(depDates$Deploy.On)
 depDates$leaveColony <- as.Date(depDates$leaveColony)
 
 # -------------------------------------------------------------
 
-setwd("E:/Geolocators/raw")
+setwd("E:/Geolocators/data/GLS")
 theFiles <- list.files()
 
-# Light threshold, I've found 175 works well at getting the basic location estimates close to the colony
+# Light threshold, I've found 225 works well at getting the basic location estimates close to the colony
 LT <- 225
 
 # -------------------------------------------------------------
