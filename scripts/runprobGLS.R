@@ -6,8 +6,9 @@ tw <- twilight_error_estimation()
 gE <- -3.5
 
 # -------------------------------------------------------------
+#c(5, 25, 36, 37, 46, 47, 50, 51, 59)
 
-for (i in c(5, 25, 36, 37, 46, 47, 50, 51, 59)) {
+for (i in c(1:4,6:10)) {
   
   idx <- sub(".RData", "", theFiles[i])
   
@@ -21,15 +22,15 @@ for (i in c(5, 25, 36, 37, 46, 47, 50, 51, 59)) {
                          retrieval.date              = max(trn$tSecon),
                          loess.quartile              = NULL,
                          tagging.location            = c(-82.01,62.95),
-                         particle.number             = 1000,
-                         iteration.number            = 500,
+                         particle.number             = 3000,
+                         iteration.number            = 100,
                          sunrise.sd                  = tw,
                          sunset.sd                   = tw,
                          range.solar                 = c(-7,0),
                          speed.wet                   = c(1 , 1.3, 5),
                          speed.dry                   = c(15, 5, 25),
                          sst.sd                      = 0.1,      
-                         max.sst.diff                = 1,         
+                         max.sst.diff                = 0.5,         
                          days.around.spring.equinox  = c(21,14),  
                          days.around.fall.equinox    = c(14,21),
                          ice.conc.cutoff             = 0.9,
