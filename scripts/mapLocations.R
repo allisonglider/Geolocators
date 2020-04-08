@@ -8,7 +8,7 @@ library(gganimate)
 
 theme_set(theme_light())
 
-# <- c("99696852_0809", "99696965_0812","99696997_0707","996998_0715","99696993_0814")
+badBirds <- c("99696852_0809")
 
 # -----------------
 
@@ -57,12 +57,13 @@ for (i in 1:nrow(weekMean)) {
 }
 
 theBirds <- unique(weekMean$Band)
+
 for (myBird in theBirds) {
   
   temp <- weekMean[weekMean$Band == myBird,]
   
   p <- ggplot() +
-    geom_sf(data = coast, fill = grey(0.8), size = 0.3) +
+    geom_sf(data = coast, fill = grey(0.9), size = 0.3) +
     geom_sf(data = colony, shape = 17, size = 2) +
     geom_path(data = temp, aes(x = medianLon, y = medianLat)) +
     geom_point(data = temp, aes(x = medianLon, y = medianLat, fill = as.numeric(meanDate)), shape = 21) +
@@ -71,9 +72,7 @@ for (myBird in theBirds) {
     labs(title = temp$Band[1], x = "", y = "") +
     theme(axis.text.y = element_text(angle = 90))
   print(p)
-  
   readline("Next [enter]")
-  
 }
 
 # ---------------------
@@ -93,17 +92,17 @@ for (yy in c("2017/18","2018/19")) {
     geom_point(data = temp, aes(x = medianLon, y = medianLat, fill = Month, group = Band), 
                shape = 21, size = 1.1, alpha = 0.7) +
     scale_fill_viridis_d( direction = 1) +
-    scale_x_continuous(expand = c(0,0), breaks = seq(-20,-100, -20))+
+    scale_x_continuous(expand = c(0,0), breaks = seq(-10,-110, -20))+
     scale_y_continuous(expand = c(0,0), breaks = seq(50,75,10))+
     geom_sf(data = colony, shape = 24, size = 2.5, fill = "red") +
     #guides(fill = F) +
-    labs(title = paste("Thick-billed murre migration tracks", yy), x = "", y = "") +
+    labs(title = paste("Thick-billed murre migration:", yy), x = "", y = "") +
     theme(axis.text.y = element_text(angle = 90), text = element_text(size = 9), legend.text = element_text(size = 7)) 
   print(p)
   
-  ggsave(paste0("E:/Geolocators/Plots/AnnualTracks_",sub("/","_",yy),".png"), units = "cm", 
+  ggsave(paste0("E:/Geolocators/Plots/AnnualTracks_",sub("/","_",yy),".png"), units = "cm",
          width = 16, height = 10)
-  
+
   readline("Next [enter]")
   
 }
@@ -115,20 +114,22 @@ for (j in unique(temp$week)) {
   temp$meanDate[temp$week == j] <- min(temp$meanDate[temp$week == j])
 }
 
-temp <- subset(temp, temp$meanDate > "2017-08-20" & temp$meanDate < "2018-06-01")
-table(temp$meanDate)
+temp <- subset(temp, temp$meanDate > "2017-09-01" & temp$meanDate < "2018-06-01")
+length(unique(temp$meanDate))
 
 myGif <- ggplot() +
-  geom_sf(data = coast, alpha = 0.75, fill = grey(0.9), size = 0.3) +
+  geom_sf(data = coast, alpha = 1, fill = grey(0.9), size = 0.1) +
   geom_point(data = temp, aes(x = medianLon, y = medianLat, col = (Band)), 
-             alpha = 0.85, show.legend = F, size = 2) +
+             alpha = 0.85, show.legend = F, size = 4) +
   transition_states(meanDate, transition_length = 1, state_length = 1) +
   labs(title = 'Date: {closest_state}', x = '', y = '') +
-  scale_fill_viridis_d(direction = 1) +
-  scale_x_continuous(expand = c(0,0), breaks = seq(-20,-100,-20))+
+  scale_color_viridis_d(direction = 1) +
+  scale_x_continuous(expand = c(0,0), breaks = seq(-10,-110,-20))+
   scale_y_continuous(expand = c(0,0), breaks = seq(50,75,10))+
   geom_sf(data = colony, shape = 24, size = 2.5, fill = "red") +
   guides(fill = F) +
   theme(axis.text.y = element_text(angle = 90), text = element_text(size = 12))
-animate(myGif, nframes = 500, fps = 5)
-anim_save("D:/TBMU-Winter-Diving/Plots/annualTracks//Migration_2017.gif")
+animate(myGif, nframes = 500, fps = 5, width = 1200, height = 900)
+anim_save("E:/Geolocators/plots/Migration_2017.gif")
+
+# -----
