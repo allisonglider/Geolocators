@@ -8,7 +8,7 @@ gE <- -3.5
 # -------------------------------------------------------------
 #c(5, 25, 36, 37, 46, 47, 50, 51, 59)
 
-for (i in c(11:20)) {
+for (i in c(1:length(theFiles))) {
   
   idx <- sub(".RData", "", theFiles[i])
   
@@ -42,7 +42,7 @@ for (i in c(11:20)) {
                          caspian.sea                 = T,   
                          east.west.comp              = T,
                          wetdry.resolution           = 1,
-                         NOAA.OI.location            = "C:\\Users\\Allison\\Documents\\PhD research\\Coats 2019 Data\\TBMU GLS Data\\Analysis\\envir")
+                         NOAA.OI.location            = "E:\\Geolocators\\data\\envir")
   
   # plot lat, lon, SST vs time ----
   plot_timeline(pr,degElevation = NULL)
