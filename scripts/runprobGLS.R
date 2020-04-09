@@ -8,7 +8,7 @@ gE <- -3.5
 # -------------------------------------------------------------
 #c(5, 25, 36, 37, 46, 47, 50, 51, 59)
 
-for (i in c(1:length(theFiles))) {
+for (i in c(21:40)) {
   
   idx <- sub(".RData", "", theFiles[i])
   
@@ -22,7 +22,7 @@ for (i in c(1:length(theFiles))) {
                          retrieval.date              = max(trn$tSecon),
                          loess.quartile              = NULL,
                          tagging.location            = c(-82.01,62.95),
-                         particle.number             = 3000,
+                         particle.number             = 2000,
                          iteration.number            = 100,
                          sunrise.sd                  = tw,
                          sunset.sd                   = tw,
@@ -30,7 +30,7 @@ for (i in c(1:length(theFiles))) {
                          speed.wet                   = c(1 , 1.3, 5),
                          speed.dry                   = c(15, 5, 25),
                          sst.sd                      = 0.1,      
-                         max.sst.diff                = 0.5,         
+                         max.sst.diff                = 1,         
                          days.around.spring.equinox  = c(21,14),  
                          days.around.fall.equinox    = c(14,21),
                          ice.conc.cutoff             = 0.9,
