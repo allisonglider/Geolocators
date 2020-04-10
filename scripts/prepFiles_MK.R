@@ -34,7 +34,7 @@ tags <- list.dirs("E:/Geolocators/data/Coats_2007_2009", full.names = F)[-1]
 
 # -------------------------------------------------------------
 
-i = 25
+i = 1
 
 # -------------------------------------------------------------
 setwd(folders[i])
@@ -77,7 +77,7 @@ tsimageLines(coatsTwl$dusk, offset = -5, col = "blue", lwd = 2)
 
 rm(twl)
 twl <- preprocessLight(light, 
-                       threshold = 5,
+                       threshold = 15,
                        lmax = 70)
 head(twl)
 
@@ -96,14 +96,16 @@ temp <- myData %>%
   dplyr::select(date, Temp) %>% 
   group_by(date) %>% 
   summarize(
-    SST = median(Temp)
+    SST = median(Temp),
+    n = n()
   ) %>% 
+  ungroup() %>% 
   mutate(
-    SST.remove = F
+    SST.remove = F,
+    SST = na_interpolation(SST)
   ) %>% 
   data.frame()
 
-if (exists("temp")) 
   p <- ggplot(temp, aes(date, SST)) +
     geom_line() +
     geom_point()
