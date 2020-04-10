@@ -1,6 +1,8 @@
 library(probGLS)
 
-folder <- "E:/Geolocators/analysis/processed"
+years <- "Coats_2007_2009"
+
+folder <- paste0("E:/Geolocators/analysis/processed/",years)
 theFiles <- list.files(folder)
 tw <- twilight_error_estimation()
 gE <- -3.5
@@ -8,16 +10,16 @@ gE <- -3.5
 # -------------------------------------------------------------
 #c(5, 25, 36, 37, 46, 47, 50, 51, 59)
 
-for (i in c(21:40)) {
+for (i in c(1:length(theFiles))) {
   
   idx <- sub(".RData", "", theFiles[i])
   
   # Save file
-  load(paste0("E:/Geolocators/analysis/processed/", theFiles[i]))
+  load(paste0("E:/Geolocators/analysis/processed/",years,"/",theFiles[i]))
   
   pr   <- prob_algorithm(trn                         = trn,
-                         sensor                      = temp,
-                         act                         = act,
+                         sensor                      = if (exists("temp")) temp else (NULL),
+                         act                         = if (exists("act")) act else (NULL),
                          tagging.date                = min(trn$tFirst),
                          retrieval.date              = max(trn$tSecon),
                          loess.quartile              = NULL,
@@ -26,9 +28,9 @@ for (i in c(21:40)) {
                          iteration.number            = 100,
                          sunrise.sd                  = tw,
                          sunset.sd                   = tw,
-                         range.solar                 = c(-7,0),
-                         speed.wet                   = c(1 , 1.3, 5),
-                         speed.dry                   = c(15, 5, 25),
+                         range.solar                 = c(-6,-1),
+                         speed.wet                   = if (exists("act")) c(1 , 1.3, 5) else c(3, 5, 15),
+                         speed.dry                   = if (exists("act")) c(15, 5, 25) else c(3, 5, 15),
                          sst.sd                      = 0.1,      
                          max.sst.diff                = 1,         
                          days.around.spring.equinox  = c(21,14),  
@@ -47,20 +49,20 @@ for (i in c(21:40)) {
   # plot lat, lon, SST vs time ----
   plot_timeline(pr,degElevation = NULL)
   
-  png(file=paste0("E:/Geolocators/plots/probGLS/",idx,"_LL.png"), width=6.5, height=8, units="in", res=300)
+  png(file=paste0("E:/Geolocators/plots/probGLS/",years,"/",idx,"_LL.png"), width=6.5, height=8, units="in", res=300)
   plot_timeline(pr,degElevation = NULL)
   dev.off()
   
   # plot lon vs lat map ----
   plot_map(pr)
   
-  png(file=paste0("E:/Geolocators/plots/probGLS/",idx,"_Map.png"), width=6.5, height=8, units="in", res=300)
+  png(file=paste0("E:/Geolocators/plots/probGLS/",years,"/",idx,"_Map.png"), width=6.5, height=8, units="in", res=300)
   plot_map(pr)
   dev.off()
   
   output <- data.frame(pr[[1]])
   
-  saveRDS(pr, paste0("E:/Geolocators/analysis/probGLS/",idx,".RDS"))
-  write.csv(output, paste0("E:/Geolocators/analysis/probGLS/",idx,".csv"), row.names = F)
+  saveRDS(pr, paste0("E:/Geolocators/analysis/probGLS/",years,"/",idx,".RDS"))
+  write.csv(output, paste0("E:/Geolocators/analysis/probGLS/",years,"/",idx,".csv"), row.names = F)
 }
 
