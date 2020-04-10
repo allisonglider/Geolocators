@@ -8,6 +8,7 @@ library(dplyr)
 library(suncalc)
 library(imputeTS)
 library(probGLS)
+library(xlsx)
 
 coatsTwl <- getSunlightTimes(
   date = seq(as.Date("2007-07-01"), as.Date("2010-07-31"),1),
@@ -22,23 +23,35 @@ tw <- twilight_error_estimation()
 
 # -------------------------------------------------------------
 
-setwd("E:/Geolocators/data/Coats_2007/99697041_5222")
-rm(myData, temp, act)
+dep <- read.xlsx("E:/Geolocators/data/Coats Deployments_2007_2009.xlsx", sheetIndex = 3, stringsAsFactors = F)
+
+dep$Deployment.Start.GMT <- as.POSIXct(dep$Deployment.Start.GMT, tz = "GMT")
+
+# -------------------------------------------------------------
+
+folders <- list.dirs("E:/Geolocators/data/Coats_2007_2009")[-1]
+tags <- list.dirs("E:/Geolocators/data/Coats_2007_2009", full.names = F)[-1]
+
+# -------------------------------------------------------------
+
+i = 25
+
+# -------------------------------------------------------------
+setwd(folders[i])
+tagID <- tags[i]
+
+idx <- which(dep$Device == tagID)
+print(idx)
+
+rm(myData, light, temp)
 
 theFiles <- list.files(pattern = "lig", full.names = T)
 myData <- read.csv(theFiles, skip = 0, header = F)
 names(myData) <- c("Valid","Timestamp","Date_num","Light")
 head(myData)
 
-theFiles <- list.files(pattern = "act", full.names = T)
-if (length(theFiles)>0) {
-  act <- read.csv(theFiles, skip = 0, header = F)
-  names(act) <- c("Valid","Timestamp","Date_num","Act")
-  myData <- merge(myData, act, all = T)
-} else myData$Act <- NA
-
 theFiles <- list.files(pattern = "tem", full.names = T)
-if (length(theFiles)>0) {
+if (length(theFiles) > 0) {
   tem <- read.csv(theFiles, skip = 0, header = F)
   names(tem) <- c("Valid","Timestamp","Date_num","Temp")
   myData <- merge(myData, tem, all = T)
@@ -46,7 +59,9 @@ if (length(theFiles)>0) {
 
 myData$Timestamp <- as.POSIXct(strptime(myData$Timestamp, "%d/%m/%y %H:%M:%S"), tz = "GMT")
 myData <- myData[order(myData$Timestamp),]
+myData <- subset(myData, myData$Timestamp >= dep$Deployment.Start.GMT[idx])
 head(myData)
+summary(myData$Temp)
 
 # -------------------------------------------------------------
 
@@ -74,20 +89,7 @@ trn <- data.frame(
 
 # -------------------------------------------------------------
 
-myData %>% 
-  mutate(
-    date = as.Date(Timestamp),
-    dry = 600 - (Act * 3),
-    dry = ifelse(Light > 60, dry, 0)) %>% 
-  group_by(date) %>% 
-  summarise(
-    dry = sum(dry)/(60 * 60)
-  ) %>% ggplot(aes(date, dry)) +
-  geom_line()
-
-# -------------------------------------------------------------
-
-
+if (!is.infinite(max(myData$Temp, na.rm = T))) {
 temp <- myData %>% 
   filter(Temp < 12, Temp >-2) %>% 
   mutate(date = as.Date(Timestamp, tz = "GMT")) %>% 
@@ -101,44 +103,19 @@ temp <- myData %>%
   ) %>% 
   data.frame()
 
-ggplot(temp, aes(date, SST)) +
-  geom_line() +
-  geom_point()
+if (exists("temp")) 
+  p <- ggplot(temp, aes(date, SST)) +
+    geom_line() +
+    geom_point()
+  print(p)
+}
 
 # -------------------------------------------------------------
 
-pr   <- prob_algorithm(trn                         = trn,
-                       sensor                      = temp,
-                       act                         = NULL,
-                       tagging.date                = min(trn$tFirst),
-                       retrieval.date              = max(trn$tSecon),
-                       loess.quartile              = NULL,
-                       tagging.location            = c(-82.01,62.95),
-                       particle.number             = 500,
-                       iteration.number            = 50,
-                       sunrise.sd                  = tw,
-                       sunset.sd                   = tw,
-                       range.solar                 = c(-7,0),
-                       speed.wet                   = c(3, 5, 15),
-                       speed.dry                   = c(3, 5, 15),
-                       sst.sd                      = 0.1,      
-                       max.sst.diff                = 1,         
-                       days.around.spring.equinox  = c(21,14),  
-                       days.around.fall.equinox    = c(14,21),
-                       ice.conc.cutoff             = 0.9,
-                       boundary.box                = c(-110,-10,30,75),
-                       land.mask                   = T,
-                       med.sea                     = T,       
-                       black.sea                   = T,       
-                       baltic.sea                  = T,     
-                       caspian.sea                 = T,   
-                       east.west.comp              = T,
-                       wetdry.resolution           = 1,
-                       NOAA.OI.location            = "E:\\Geolocators\\data\\envir")
+if (exists("temp")) {
+  save(light, temp, twl, trn, myData, file = paste0("E:/Geolocators/analysis/processed/Coats_2007_2009/", dep$Band[idx], "_", dep$Device[idx],".RData"))
+} else {
+  save(light, twl, trn, myData, file = paste0("E:/Geolocators/analysis/processed/Coats_2007_2009/", dep$Band[idx], "_", dep$Device[idx],".RData"))
+}
 
-# plot lat, lon, SST vs time ----
-plot_timeline(pr,degElevation = NULL)
-
-# plot lon vs lat map ----
-plot_map(pr)
-
+# -------------------------------------------------------------
