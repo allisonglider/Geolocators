@@ -10,12 +10,17 @@ gE <- -3.5
 # -------------------------------------------------------------
 #c(5, 25, 36, 37, 46, 47, 50, 51, 59)
 
-for (i in c(1:length(theFiles))) {
+for (i in c(11:22)) {
+  
+  if (exists("temp")) rm(temp)
+  if (exists("act")) rm(act)
+  if (exists("trn")) rm(trn)
+  
+  load(paste0(folder,"/",theFiles[i]))
   
   idx <- sub(".RData", "", theFiles[i])
   
-  # Save file
-  load(paste0("E:/Geolocators/analysis/processed/",years,"/",theFiles[i]))
+  #getElevation(twl = trn[1:20,], known.coord = c(-82.01,62.95))
   
   pr   <- prob_algorithm(trn                         = trn,
                          sensor                      = if (exists("temp")) temp else (NULL),
@@ -23,16 +28,16 @@ for (i in c(1:length(theFiles))) {
                          tagging.date                = min(trn$tFirst),
                          retrieval.date              = max(trn$tSecon),
                          loess.quartile              = NULL,
-                         tagging.location            = c(-82.01,62.95),
-                         particle.number             = 2000,
+                         tagging.location            = c(-82.01, 62.95),
+                         particle.number             = 1000,
                          iteration.number            = 100,
                          sunrise.sd                  = tw,
                          sunset.sd                   = tw,
                          range.solar                 = c(-6,-1),
-                         speed.wet                   = if (exists("act")) c(1 , 1.3, 5) else c(3, 5, 15),
+                         speed.wet                   = if (exists("act")) c(1, 1.3, 5) else c(3, 5, 15),
                          speed.dry                   = if (exists("act")) c(15, 5, 25) else c(3, 5, 15),
                          sst.sd                      = 0.1,      
-                         max.sst.diff                = 1,         
+                         max.sst.diff                = 0.5,         
                          days.around.spring.equinox  = c(21,14),  
                          days.around.fall.equinox    = c(14,21),
                          ice.conc.cutoff             = 0.9,
