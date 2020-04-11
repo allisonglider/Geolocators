@@ -5,6 +5,7 @@ library(sf)
 library(ggplot2)
 library(mapview)
 library(gganimate)
+library(lwgeom)
 
 theme_set(theme_light())
 
@@ -13,12 +14,14 @@ badBirds <- c("99696852_0809")
 # -----------------
 
 coast <- readOGR("C:/Users/Allison/Documents/EnvirFiles/Coastline/GSHHS_shp/i/GSHHS_i_L1.shp")
-coast <- as(crop(coast, extent(c(-100, -25, 45, 72))), "sf")
+coast <- as(coast, "sf")
+coast <- st_make_valid(coast)
+coast <- st_crop(coast, xmin = -100, xmax = -25, ymin = 35, ymax =72)
 colony <- as(SpatialPoints(data.frame(lon = -82.01, lat = 62.95), proj4string = crs("+proj=longlat +datum=WGS84 +no_defs")), "sf")
 
 # -----------------
-
-theFolder <- "E:/Geolocators/Analysis/probGLS"
+year <- "Coats_2007_2009"
+theFolder <- paste0("E:/Geolocators/Analysis/probGLS/",year)
 theFiles <- list.files(theFolder, pattern = "RDS", full.names = F)
 
 myData <- data.frame()
@@ -77,12 +80,17 @@ for (myBird in theBirds) {
 
 # ---------------------
 
-weekMean$trackYear <- ifelse(weekMean$meanDate < "2018-08-01", "2017/18","2018/19")
+weekMean$trackYear <- NA
+weekMean$trackYear[weekMean$meanDate >= "2017-08-01" & weekMean$meanDate < "2018-08-01" ] <- "2017/18"
+weekMean$trackYear[weekMean$meanDate >= "2018-08-01" & weekMean$meanDate < "2019-08-01" ] <- "2018/19"
+weekMean$trackYear[weekMean$meanDate >= "2007-08-01" & weekMean$meanDate < "2008-08-01" ] <- "2007/08"
+weekMean$trackYear[weekMean$meanDate >= "2008-08-01" & weekMean$meanDate < "2009-08-01" ] <- "2008/09"
+weekMean$trackYear[weekMean$meanDate >= "2009-08-01" & weekMean$meanDate < "2010-08-01" ] <- "2009/10"
 
-for (yy in c("2017/18","2018/19")) {
+for (yy in unique(weekMean$trackYear)) {
   
   temp <- weekMean[weekMean$trackYear == yy,]
-  temp <- subset(temp, temp$meanLat > 45 & temp$meanLat < 75)
+  #temp <- subset(temp, temp$meanLat > 45 & temp$meanLat < 75)
   temp$Month <- factor(strftime(temp$meanDate, "%b"), c("Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun",'Jul'))
   
   p <- ggplot() +
@@ -93,7 +101,7 @@ for (yy in c("2017/18","2018/19")) {
                shape = 21, size = 1.1, alpha = 0.7) +
     scale_fill_viridis_d( direction = 1) +
     scale_x_continuous(expand = c(0,0), breaks = seq(-10,-110, -20))+
-    scale_y_continuous(expand = c(0,0), breaks = seq(50,75,10))+
+    scale_y_continuous(expand = c(0,0), breaks = seq(5,75,10))+
     geom_sf(data = colony, shape = 24, size = 2.5, fill = "red") +
     #guides(fill = F) +
     labs(title = paste("Thick-billed murre migration:", yy), x = "", y = "") +
@@ -109,12 +117,12 @@ for (yy in c("2017/18","2018/19")) {
 
 # -----
 
-temp <- weekMean[weekMean$trackYear == "2017/18",]
+temp <- weekMean[weekMean$trackYear == "2007/08",]
 for (j in unique(temp$week)) {
   temp$meanDate[temp$week == j] <- min(temp$meanDate[temp$week == j])
 }
 
-temp <- subset(temp, temp$meanDate > "2017-09-01" & temp$meanDate < "2018-06-01")
+temp <- subset(temp, temp$meanDate > "2007-09-01" & temp$meanDate < "2008-06-01")
 length(unique(temp$meanDate))
 
 myGif <- ggplot() +
@@ -130,6 +138,6 @@ myGif <- ggplot() +
   guides(fill = F) +
   theme(axis.text.y = element_text(angle = 90), text = element_text(size = 12))
 animate(myGif, nframes = 500, fps = 5, width = 1200, height = 900)
-anim_save("E:/Geolocators/plots/Migration_2017.gif")
+anim_save("E:/Geolocators/plots/Migration_2007.gif")
 
 # -----
