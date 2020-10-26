@@ -8,9 +8,8 @@ tw <- twilight_error_estimation()
 gE <- -3.5
 
 # -------------------------------------------------------------
-#c(5, 25, 36, 37, 46, 47, 50, 51, 59)
 
-for (i in c(11:22)) {
+for (i in c(4, 9, 17, 24, 26, 20)) {
   
   if (exists("temp")) rm(temp)
   if (exists("act")) rm(act)
@@ -28,8 +27,8 @@ for (i in c(11:22)) {
                          tagging.date                = min(trn$tFirst),
                          retrieval.date              = max(trn$tSecon),
                          loess.quartile              = NULL,
-                         tagging.location            = c(-82.01, 62.95),
-                         particle.number             = 1000,
+                         tagging.location            = if (years == "Digges_2008_2010") c(-77.72, 62.56) else c(-82.01, 62.95),
+                         particle.number             = 2000,
                          iteration.number            = 100,
                          sunrise.sd                  = tw,
                          sunset.sd                   = tw,
@@ -37,7 +36,7 @@ for (i in c(11:22)) {
                          speed.wet                   = if (exists("act")) c(1, 1.3, 5) else c(3, 5, 15),
                          speed.dry                   = if (exists("act")) c(15, 5, 25) else c(3, 5, 15),
                          sst.sd                      = 0.1,      
-                         max.sst.diff                = 0.5,         
+                         max.sst.diff                = 2,         
                          days.around.spring.equinox  = c(21,14),  
                          days.around.fall.equinox    = c(14,21),
                          ice.conc.cutoff             = 0.9,
