@@ -34,11 +34,12 @@ tags <- list.dirs("E:/Geolocators/data/Coats_2007_2009", full.names = F)[-1]
 
 # -------------------------------------------------------------
 
-i = 1
+i = 23
 
 # -------------------------------------------------------------
 setwd(folders[i])
 tagID <- tags[i]
+tagID
 
 idx <- which(dep$Device == tagID)
 print(idx)
@@ -62,6 +63,9 @@ myData <- myData[order(myData$Timestamp),]
 myData <- subset(myData, myData$Timestamp >= dep$Deployment.Start.GMT[idx])
 head(myData)
 summary(myData$Temp)
+
+if (tagID %in% c(5675, 8198, 5673, 4416, 4397)) myData$Timestamp <- myData$Timestamp - 1*60*60
+if (tagID %in% c(5692)) myData$Timestamp <- myData$Timestamp + 1*60*60
 
 # -------------------------------------------------------------
 
